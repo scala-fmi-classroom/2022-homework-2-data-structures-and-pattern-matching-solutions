@@ -33,8 +33,8 @@ object LazyCons:
   def apply[A](h: => A, t: => LazyList[A]): LazyCons[A] = new LazyCons[A](h, t)
 
 object LazyList:
-  def from(start: Int, step: Int = 1): LazyList[Int] = LazyCons(start, from(start + step, step))
-  val naturalNumbers: LazyList[Int] = from(0)
+  def from(start: Long, step: Int = 1): LazyList[Long] = LazyCons(start, from(start + step, step))
+  val naturalNumbers: LazyList[Long] = from(0L)
 
   extension [A](el: => A)
     // If we define #:: on the LazyList itself it won't work because LazyList instances would be passed eagerly.
@@ -51,4 +51,4 @@ object LazyListExamples extends App:
   val factorials: LazyList[Long] = ???
   val firstTenFactorials = factorials.take(10).toList
 
-  println(s"First ten factorials are: $firstTenFibs")
+  println(s"First ten factorials are: $firstTenFactorials")
