@@ -9,13 +9,25 @@ sealed trait LazyList[+A]:
 
   def isEmpty: Boolean
 
-  def take(n: Int): LazyList[A] = ???
+  def take(n: Int): LazyList[A] =
+    if n == 0 then LazyNil
+    else LazyCons(head, tail.take(n - 1))
 
-  def map[B](f: A => B): LazyList[B] = ???
+  def map[B](f: A => B): LazyList[B] =
+    if isEmpty then LazyNil
+    else LazyCons(f(head), tail.map(f))
 
-  def zip[B](that: LazyList[B]): LazyList[(A, B)] = ???
+  def zip[B](that: LazyList[B]): LazyList[(A, B)] =
+    if this.isEmpty || that.isEmpty then LazyNil
+    else LazyCons((this.head, that.head), this.tail zip that.tail)
 
-  def toList: List[A] = ???
+  def toList: List[A] =
+    @tailrec
+    def loop(xs: LazyList[A], acc: List[A]): List[A] =
+      if xs.isEmpty then acc.reverse
+      else loop(xs.tail, xs.head :: acc)
+
+    loop(this, Nil)
 
 class LazyCons[+A](h: => A, t: => LazyList[A]) extends LazyList[A]:
   lazy val head: A = h
@@ -48,7 +60,7 @@ object LazyListExamples extends App:
 
   println(s"First ten fibs are: $firstTenFibs")
 
-  val factorials: LazyList[Long] = ???
+  val factorials: LazyList[Long] = 1L #:: (factorials zip LazyList.from(1)).map(_ * _)
   val firstTenFactorials = factorials.take(10).toList
 
   println(s"First ten factorials are: $firstTenFactorials")
